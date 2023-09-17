@@ -1,13 +1,15 @@
 HOSTNAME := $(shell hostname)
+UID := $(shell id -u)
+UID := $(shell id -g)
 
 build:
 	docker build -t topaz-vai .
 
 login:
-	docker run --net=host --gpus all --rm -ti -v $(PWD)/auth:/auth --name topaz-login --hostname $(HOSTNAME) topaz-vai login
+	docker run --net=host --gpus all --rm -ti --user $(UID):$(GID) -v $(PWD)/auth:/auth --name topaz-login --hostname $(HOSTNAME) topaz-vai login
 
 test:
-	docker run --rm -ti --name vai-test --hostname $(HOSTNAME) \
+	docker run --rm -ti --user $(UID):$(GID) --name vai-test --hostname $(HOSTNAME) \
 		-v $(PWD)/models:/models \
 		-v $(PWD)/auth/auth.tpz:/opt/TopazVideoAIBETA/models/auth.tpz \
 		-v $(PWD):/workspace \
