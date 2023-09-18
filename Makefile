@@ -9,7 +9,7 @@ login:
 	docker run --net=host --gpus all --rm -ti --user $(UID):$(GID) -v $(PWD)/auth:/auth --name topaz-login --hostname $(HOSTNAME) topaz-vai login
 
 test:
-	docker run --rm -ti --user $(UID):$(GID) --name vai-test --hostname $(HOSTNAME) \
+	docker run --rm -ti --gpus all --user $(UID):$(GID) --name vai-test --hostname $(HOSTNAME) \
 		-v $(PWD)/models:/models \
 		-v $(PWD)/auth/auth.tpz:/opt/TopazVideoAIBETA/models/auth.tpz \
 		-v $(PWD):/workspace \
