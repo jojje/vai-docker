@@ -24,5 +24,5 @@ test:     ## Run a smoke test doing a 2x upscale with Protheus
 		-flush_packets 1 -sws_flags spline+accurate_rnd+full_chroma_int \
 		-color_trc 2 -colorspace 2 -color_primaries 2 \
 		-filter_complex "tvai_up=model=prob-3:scale=2:preblur=-0.6:noise=0:details=1:halo=0.03:blur=1:compression=0:estimate=20:blend=0.8:device=0:vram=1:instances=1" \
-		-c:v h264_nvenc -profile:v high -preset medium -pix_fmt yuv420p -b:v 0 \
+		-c:v h264_nvenc -profile:v high -preset medium -b:v 0 \
 		sample_prob3_2x_upscaled.mp4
