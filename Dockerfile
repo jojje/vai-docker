@@ -1,10 +1,5 @@
 FROM nvidia/cuda:12.1.1-cudnn8-runtime-ubuntu22.04
 
-# Version of VAI to build
-ENV VAI_VERSION=3.4.4.0.b
-ARG VAI_SHA2=607e1b9ad497a353f5efe901a1640a7fe1f9dc7445bbad16f86bf0969f5b9083
-ARG VAI_DIR=/opt/TopazVideoAIBETA
-
 # Tell the CUDA environment what GPU features to expose in the container.
 ENV NVIDIA_DRIVER_CAPABILITIES $NVIDIA_DRIVER_CAPABILITIES,video,graphics
 
@@ -35,6 +30,11 @@ RUN apt-get update && apt-get install -y \
     curl \
     net-tools \
  && rm -rf /var/lib/apt/lists/*
+
+# Version of VAI to build
+ENV VAI_VERSION=3.4.4.0.b
+ARG VAI_SHA2=607e1b9ad497a353f5efe901a1640a7fe1f9dc7445bbad16f86bf0969f5b9083
+ARG VAI_DIR=/opt/TopazVideoAIBETA
 
 # Install the VAI deb package
 RUN curl -Lo vai.deb "https://downloads.topazlabs.com/deploy/TopazVideoAIBeta/${VAI_VERSION}/TopazVideoAIBeta_${VAI_VERSION}_amd64.deb" \
