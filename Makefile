@@ -4,7 +4,7 @@ HOSTNAME := $(shell hostname)
 UID := $(shell id -u)
 GID := $(shell id -g)
 IMAGE := topaz-vai
-TAG := 3440b
+TAG := 3390b
 
 
 help:

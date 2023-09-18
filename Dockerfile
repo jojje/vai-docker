@@ -32,8 +32,8 @@ RUN apt-get update && apt-get install -y \
  && rm -rf /var/lib/apt/lists/*
 
 # Version of VAI to build
-ENV VAI_VERSION=3.4.4.0.b
-ARG VAI_SHA2=607e1b9ad497a353f5efe901a1640a7fe1f9dc7445bbad16f86bf0969f5b9083
+ENV VAI_VERSION=3.3.9.0.b
+ARG VAI_SHA2=a7de7730e039a8542280c65734143b6382c72eaa81e6fd8c0f23432ca13c8ba2
 ARG VAI_DIR=/opt/TopazVideoAIBETA
 
 # Install the VAI deb package
