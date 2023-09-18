@@ -1,6 +1,6 @@
 HOSTNAME := $(shell hostname)
 UID := $(shell id -u)
-UID := $(shell id -g)
+GID := $(shell id -g)
 
 build:
 	docker build -t topaz-vai .
