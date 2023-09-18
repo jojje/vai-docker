@@ -1,14 +1,20 @@
+.PHONY: help
+
 HOSTNAME := $(shell hostname)
 UID := $(shell id -u)
 GID := $(shell id -g)
 
-build:
+
+help:
+	@egrep -h '\s##\s' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[1;32m%-10s\033[0m %s\n", $$1, $$2}'
+
+build:    ## Build image capable of using fp16/32 models
 	docker build -t topaz-vai .
 
-login:
+login:    ## Refresh the auth.tpz license file
 	docker run --net=host --gpus all --rm -ti --user $(UID):$(GID) -v $(PWD)/auth:/auth --name topaz-login --hostname $(HOSTNAME) topaz-vai login
 
-test:
+test:     ## Run a smoke test doing a 2x upscale with Iris
 	docker run --rm -ti --gpus all --user $(UID):$(GID) --name vai-test --hostname $(HOSTNAME) \
 		-v $(PWD)/models:/models \
 		-v $(PWD)/auth/auth.tpz:/opt/TopazVideoAIBETA/models/auth.tpz \
