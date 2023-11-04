@@ -94,3 +94,7 @@ Because there may be copyright issues involved. Needs to be cleared with Topaz L
 This is a potential future improvement that is being considered. Right now I haven't been able to make VAI work on any of the AWS GPU instance types, so finding a suitable environment that both Topaz Labs and users can leverage would need to be discussed first. 
 
 For now having at least a common VAI setup that both the provider and customers can use is a first step. That reduces the variance to just the specific hardware used, the host kernel version and the specific NVIDIA driver used on the host. The rest is standardized in the container image.
+
+### Q7: With the license key mounted, I still get the watermark on videos. Why?
+
+It's most likely because you don't provide a static hostname for the container, or the same hostname you used when "logging in" (getting the license key). Part of the minted license key information is the hostname. As such it's critical to use the same hostname for logging in as when running the container. That's why the examples in this document provide the --hostname argument to docker.
