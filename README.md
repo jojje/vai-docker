@@ -3,8 +3,14 @@
 This repository provides a turn-key solution to running Topaz Video AI on Linux (AMD64) in a containerized manner.
 
 ## Usage
+1. Build the container
 
-1. Get an `auth.tpz` file for the machine you'll run the container on:
+
+   ```sh
+   make build
+   ```
+
+2. Get an `auth.tpz` file for the machine you'll run the container on:
 
    ```sh
    make login
@@ -12,7 +18,7 @@ This repository provides a turn-key solution to running Topaz Video AI on Linux 
 
    Follow the two-step instructions presented when invoking the make target.
 
-2. Use VAI via ffmpeg
+3. Use VAI via ffmpeg
 
    ```sh
    make test
