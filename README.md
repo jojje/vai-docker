@@ -30,12 +30,32 @@ If you want to process clips on the host, just mount the directory containing th
 E.g.
 
 ```
-docker run --rm -ti --gpus all -hostname  $HOSTNAME --user $UID:$GID \
+docker run --rm -ti --gpus all -hostname $HOSTNAME --user $UID:$GID \
 -v $PWD/models:/models \
 -v $PWD/auth/auth.tpz:/opt/TopazVideoAIBETA/models/auth.tpz \
 -v $PWD:/workspace topaz-vai \
 ffmpeg -i clip-from-host.mp4 ...
 ```
+
+Side-note:
+
+If you want to separate the workspace from the models and license key, just mount those other directories instead.
+In my personal setup, I've got the models in /tmp/models on the host, and the license key in my home directory, so the command I use to run the container is instead:
+
+```
+docker run --rm -ti --gpus all -hostname $HOSTNAME --user $UID:$GID \
+-v /tmp/models:/models \
+-v $HOME/.vai/auth.tpz:/opt/TopazVideoAIBETA/models/auth.tpz \
+-v $PWD:/workspace topaz-vai \
+ffmpeg -i clip-from-host.mp4 ...
+```
+
+Where the container looks for the respective files is controlled by the ordinary Topaz environment variables;
+
+* `TVAI_MODEL_DATA_DIR` for the model files (the gigabytes of tpz files downloaded). Defaults to `/models` in the image.
+* `TVAI_MODEL_DIR` where ffmpeg looks for the model metadata files (the json files, such as aaa.json). Defaults to the install directory of VAI (`/opt/TopazVideoAIBETA/models`) since the VAI deb package installs all the model metadata files in that exact directory.
+
+So you can change where ffmpeg looks for these two things by overriding those two environment variables when you launch a container. E.g. `docker .... -e TVAI_MODEL_DATA_DIR=/mnt/some-dir -v $MY_HOST_MODEL_DIR:/mnt/some-dir`, but I really don't see a reason anyone would want to. But if _you_ do, then that's how.
 
 ## FAQ
 
