@@ -30,7 +30,10 @@ If you want to process clips on the host, just mount the directory containing th
 E.g.
 
 ```
-docker run --rm -ti -h $HOSTNAME -v $PWD/models:/models -v $PWD:/workspace topaz-vai \
+docker run --rm -ti --gpus all -hostname  $HOSTNAME --user $UID:$GID \
+-v $PWD/models:/models \
+-v $PWD/auth/auth.tpz:/opt/TopazVideoAIBETA/models/auth.tpz \
+-v $PWD:/workspace topaz-vai \
 ffmpeg -i clip-from-host.mp4 ...
 ```
 
