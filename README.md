@@ -97,7 +97,7 @@ _This set of debs were those I could find in the Beta release notes that had bin
 
 ### Streamlining building and using different versions
 
-Building and testing different versions of VAI is a common task, and sort of the whole point with this repository. As such that process has been streamlined using the provided Makefile.
+Building and testing different versions of VAI is a common task, and sort of the whole point of this repository. As such that process has been streamlined using the provided Makefile.
 
 ```
 $ make build VAI_VERSION=4.0.7.0.b \
@@ -128,7 +128,7 @@ Yes. The file is only valid for a limited time. How long exactly, Topaz has not 
 
 If you run into a problem where the watermark suddenly starts being introduced, it may be because the license file expired. Just redo step 1 in the usage instruction to get a refreshed license file.
 
-### Q3: The `make test` run doesn't the encoding pipeline, just exists, why ?
+### Q3: The `make test` doesn't run the encoding pipeline, just exits, why ?
 
 Most likely because of CUDA out of memory crash. Different versions of the Topaz engine produce different level of error details. _3.3.9 beta_ was very helpful reporting exactly the cause, down to the CUDA function that triggered the OOM. _3.4.4 beta_ seems less helpful and just silently dies prematurely.
 
