@@ -6,8 +6,8 @@ GID := $(shell id -g)
 IMAGE := topaz-vai
 
 # Change these two if you want to build a different version
-VAI_VERSION := 3.4.4.0.b
-VAI_SHA2 := 607e1b9ad497a353f5efe901a1640a7fe1f9dc7445bbad16f86bf0969f5b9083
+VAI_VERSION := 4.0.7.0.b
+VAI_SHA2 := e8567bf60e1dec961cf4b471cd93c7ac63629ab49e97aac5b9e561409224d990
 
 TAG := $(shell echo ${VAI_VERSION} | sed 's/\.//g')
 
@@ -38,6 +38,6 @@ test:     ## Run a smoke test doing a 2x upscale with Protheus
 
 benchmark: ## Run a prob3 2x upscale benchmark
 	docker run --rm -ti --gpus all $(IMAGE) \
-		ffmpeg -f lavfi -i testsrc=duration=60:size=640x480:rate=30 -pix_fmt yuv420p \
+		ffmpeg -f lavfi -i testsrc=duration=5:size=640x480:rate=30 -pix_fmt yuv420p \
 		-filter_complex "tvai_up=model=prob-3:scale=2:preblur=-0.6:noise=0:details=1:halo=0.03:blur=1:compression=0:estimate=20:blend=0.8:device=0:vram=1:instances=1" \
 		-f null -
