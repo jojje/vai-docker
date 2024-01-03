@@ -31,10 +31,12 @@ RUN apt-get update && apt-get install -y \
     net-tools \
  && rm -rf /var/lib/apt/lists/*
 
-# Version of VAI to build
-ENV VAI_VERSION=3.4.4.0.b
+# Version of VAI to build, can be overridden for `docker build` using '--build-arg`
+ARG VAI_VERSION=3.4.4.0.b
 ARG VAI_SHA2=607e1b9ad497a353f5efe901a1640a7fe1f9dc7445bbad16f86bf0969f5b9083
+
 ARG VAI_DIR=/opt/TopazVideoAIBETA
+ENV VAI_VERSION=${VAI_VERSION}
 
 # Install the VAI deb package
 RUN curl -Lo vai.deb "https://downloads.topazlabs.com/deploy/TopazVideoAIBeta/${VAI_VERSION}/TopazVideoAIBeta_${VAI_VERSION}_amd64.deb" \

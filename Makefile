@@ -4,14 +4,20 @@ HOSTNAME := $(shell hostname)
 UID := $(shell id -u)
 GID := $(shell id -g)
 IMAGE := topaz-vai
-TAG := 3440b
 
+# Change these two if you want to build a different version
+VAI_VERSION := 3.4.4.0.b
+VAI_SHA2 := 607e1b9ad497a353f5efe901a1640a7fe1f9dc7445bbad16f86bf0969f5b9083
+
+TAG := $(shell echo ${VAI_VERSION} | sed 's/\.//g')
 
 help:
 	@egrep -h '\s##\s' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[1;32m%-10s\033[0m %s\n", $$1, $$2}'
 
 build:    ## Build image capable of using fp16/32 models
-	docker build -t $(IMAGE) .
+	docker build -t $(IMAGE) \
+	--build-arg "VAI_VERSION=$(VAI_VERSION)" \
+	--build-arg "VAI_SHA2=$(VAI_SHA2)" .
 	docker tag $(IMAGE) $(IMAGE):$(TAG)
 
 login:    ## Refresh the auth.tpz license file
