@@ -37,7 +37,7 @@ docker run --rm -ti --gpus all -hostname $HOSTNAME --user $UID:$GID \
 ffmpeg -i clip-from-host.mp4 ...
 ```
 
-Side-note:
+### Customizing which information to mount where
 
 If you want to separate the workspace from the models and license key, just mount those other directories instead.
 In my personal setup, I've got the models in /tmp/models on the host, and the license key in my home directory, so the command I use to run the container is instead:
@@ -56,6 +56,65 @@ Where the container looks for the respective files is controlled by the ordinary
 * `TVAI_MODEL_DIR` where ffmpeg looks for the model metadata files (the json files, such as aaa.json). Defaults to the install directory of VAI (`/opt/TopazVideoAIBETA/models`) since the VAI deb package installs all the model metadata files in that exact directory.
 
 So you can change where ffmpeg looks for these two things by overriding those two environment variables when you launch a container. E.g. `docker .... -e TVAI_MODEL_DATA_DIR=/mnt/some-dir -v $MY_HOST_MODEL_DIR:/mnt/some-dir`, but I really don't see a reason anyone would want to. But if _you_ do, then that's how.
+
+## Build different versions of TVAI
+To build a container with a different version than the default, you need to specify two things:
+
+1. The version of TVAI to use.
+2. The SHA256 hash of the deb file for that version as obtained from Topaz.
+
+Currently Topaz does not publish the SHA256 digest separately, so you have to download the entire deb file first and compute the message digest yourself; `sha256sum TopazVideoAIBeta_<version>_amd64.deb`
+
+Example for building with a different version than the default:
+
+```
+$ curl -LO https://downloads.topazlabs.com/deploy/TopazVideoAIBeta/3.3.9.0.b/TopazVideoAIBeta_3.3.9.0.b_amd64.deb
+
+$ sha256sum TopazVideoAIBeta_3.3.9.0.b_amd64.deb
+a7de7730e039a8542280c65734143b6382c72eaa81e6fd8c0f23432ca13c8ba2  TopazVideoAIBeta_3.3.9.0.b_amd64.deb
+
+$ docker build --tag topaz-vai:3390b \
+  --build-arg "VAI_VERSION=3.3.9.0.b" \
+  --build-arg "VAI_SHA2=a7de7730e039a8542280c65734143b6382c72eaa81e6fd8c0f23432ca13c8ba2" \
+  .
+```
+
+Here are a couple of versions with their corresponding hashes, so you don't have to download the debs yourself redundantly just to compute the hashes:
+
+```
+a7de7730e039a8542280c65734143b6382c72eaa81e6fd8c0f23432ca13c8ba2  TopazVideoAIBeta_3.3.9.0.b_amd64.deb
+b0deb4c919b6543879070cada170be2df9740db0a1be9fb16630151e005a8701  TopazVideoAIBeta_3.4.3.0.b-1_amd64.deb
+607e1b9ad497a353f5efe901a1640a7fe1f9dc7445bbad16f86bf0969f5b9083  TopazVideoAIBeta_3.4.4.0.b_amd64.deb
+2ce5c76f07e97d5c16d483644d1fae276061bc39a3a5c8220a262495876efb57  TopazVideoAIBeta_3.5.1.0.b_amd64.deb
+27382ab6c3f3d0c81f3f18f3f7eacf760f740561ef12b567bd74ff73273f8392  TopazVideoAIBeta_3.5.2.0.b_amd64.deb
+4c60c46ce9c0f76314319e304d08c646529aeb554a95ceb33b76f09044f4655a  TopazVideoAIBeta_3.5.3.0.b_amd64.deb
+4d3971be331fe12fcd0e11e1e4666ef0ff3868cf03c3262338fc68b263afebf2  TopazVideoAIBeta_4.0.3.2.b_amd64.deb
+5bef82e774b70f74f040958e6516d703fab839f19a6bab5ccf72a1e1fc4ccae3  TopazVideoAIBeta_4.0.5.0.b_amd64.deb
+e8567bf60e1dec961cf4b471cd93c7ac63629ab49e97aac5b9e561409224d990  TopazVideoAIBeta_4.0.7.0.b_amd64.deb
+```
+
+_This set of debs were those I could find in the Beta release notes that had binaries published for ubuntu, as of 2024-01-02._
+
+### Streamlining building and using different versions
+
+Building and testing different versions of VAI is a common task, and sort of the whole point with this repository. As such that process has been streamlined using the provided Makefile.
+
+```
+$ make build VAI_VERSION=4.0.7.0.b \
+             VAI_SHA2=e8567bf60e1dec961cf4b471cd93c7ac63629ab49e97aac5b9e561409224d990
+```
+will create the necessary docker build commands and give your container a tag derived from the VAI version number you provided. In the example, it will run these commands for you.
+
+```
+docker build -t topaz-vai \
+--build-arg "VAI_VERSION=4.0.7.0.b" \
+--build-arg "VAI_SHA2=e8567bf60e1dec961cf4b471cd93c7ac63629ab49e97aac5b9e561409224d990" .
+docker tag topaz-vai topaz-vai:4070b
+```
+
+Do note that two docker tags are always produced; one being tagged with the specific VAI version, so you can refer back to older builds you may have, in order to compare the results between them, track down bugs or _whatever_. The other tag assigned is `:latest`, and is what the other make targets like `login`, `test` and `benchmark` use. Consequently those targets will use the latest container you built. 
+
+If you want to use those targets with a different version, then just set the `latest` tag to some of your other VAI builds. E.g. `docker tag topaz-vai:3390b topaz-vai:latest`
 
 ## FAQ
 
