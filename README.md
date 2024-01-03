@@ -130,6 +130,10 @@ If you run into a problem where the watermark suddenly starts being introduced, 
 
 ### Q3: The `make test` doesn't run the encoding pipeline, just exits, why ?
 
+Use version `3.5.1.0.b` or later.
+
+_Topaz seems to have [fixed the issue](https://community.topazlabs.com/t/tvai-engine-crashes-4-5-times-on-linux-3-4-4-0-b/52485/13). I've confirmed that version as well as the latest of this writing now both launch with 100% successrate on my 3090. The below is historical but may still be relevant in case of future release regressions._
+
 Most likely because of CUDA out of memory crash. Different versions of the Topaz engine produce different level of error details. _3.3.9 beta_ was very helpful reporting exactly the cause, down to the CUDA function that triggered the OOM. _3.4.4 beta_ seems less helpful and just silently dies prematurely.
 
 The problem seems non-deterministic, and the only way I've found to circumnavigate the issue is to just try the same command again and again. May take as many as 10 attempts, but seems to work about 1/5th of the time.
