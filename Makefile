@@ -39,5 +39,5 @@ test:     ## Run a smoke test doing a 2x upscale with Protheus
 benchmark: ## Run a prob3 2x upscale benchmark
 	docker run --rm -ti --gpus all --user $(UID):$(GID) --name vai-bench --hostname $(HOSTNAME) -v $(PWD)/models:/models $(IMAGE) \
 		ffmpeg -v verbose -f lavfi -i testsrc=duration=60:size=640x480:rate=30 -pix_fmt yuv420p \
-		-filter_complex "tvai_up=model=prob-3:scale=2:preblur=-0.6:noise=0:details=1:halo=0.03:blur=1:compression=0:estimate=20:blend=0.8:device=0:vram=1:instances=1" \
+		-filter_complex "tvai_up=model=prob-3:scale=2:preblur=-0.6:noise=0:details=1:halo=0.03:blur=1:compression=0:blend=0.8:device=0:vram=1:instances=1" \
 		-f null -
