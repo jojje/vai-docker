@@ -6,8 +6,8 @@ GID := $(shell id -g)
 IMAGE := topaz-vai
 
 # Change these two if you want to build a different version
-VAI_VERSION := 4.0.7.0.b
-VAI_SHA2 := e8567bf60e1dec961cf4b471cd93c7ac63629ab49e97aac5b9e561409224d990
+VAI_VERSION := 4.2.2.1.b
+VAI_SHA2 := 564415a97b31723f421d99e85e97902a6f5521e8fe8acc726355b73f0f47f859
 
 TAG := $(shell echo ${VAI_VERSION} | sed 's/\.//g')
 
