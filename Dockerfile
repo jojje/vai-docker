@@ -39,6 +39,10 @@ ARG VAI_SHA2=564415a97b31723f421d99e85e97902a6f5521e8fe8acc726355b73f0f47f859
 ARG VAI_DIR=/opt/TopazVideoAIBETA
 ENV VAI_VERSION=${VAI_VERSION}
 
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends fonts-inter \
+ && rm -rf /var/lib/apt/lists/*
+
 # Install the VAI deb package
 RUN curl -Lo vai.deb "https://downloads.topazlabs.com/deploy/TopazVideoAIBeta/${VAI_VERSION}/TopazVideoAIBeta_${VAI_VERSION}_amd64.deb" \
  && echo "${VAI_SHA2}  vai.deb" | sha256sum -c \
