@@ -191,7 +191,7 @@ CRITICAL:  Invalid auth file
 ```
 _using v5 in my case, which my license doesn't cover._
 
-So just use a version that you are entitled for, and the watermark should go away.
+So just use a version that you are entitled to, and the watermark should go away.
 
 ### Q8: Why the hassle with the deb hashes?
 
