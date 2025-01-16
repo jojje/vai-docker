@@ -29,7 +29,7 @@ This repository provides a turn-key solution to running Topaz Video AI on Linux 
 If you want to process clips on the host, just mount the directory containing the files to `/workspace` in the container, and they will appear at the default directory the container uses (CWD).
 E.g.
 
-```
+```sh
 docker run --rm -ti --gpus all -hostname $HOSTNAME --user $UID:$GID \
 -v $PWD/models:/models \
 -v $PWD/auth/auth.tpz:/opt/TopazVideoAIBETA/models/auth.tpz \
@@ -42,7 +42,7 @@ ffmpeg -i clip-from-host.mp4 ...
 If you want to separate the workspace from the models and license key, just mount those other directories instead.
 In my personal setup, I've got the models in /tmp/models on the host, and the license key in my home directory, so the command I use to run the container is instead:
 
-```
+```sh
 docker run --rm -ti --gpus all -hostname $HOSTNAME --user $UID:$GID \
 -v /tmp/models:/models \
 -v $HOME/.vai/auth.tpz:/opt/TopazVideoAIBETA/models/auth.tpz \
@@ -63,16 +63,8 @@ To build a container with a different version than the default, you need to spec
 1. The version of TVAI to use.
 2. The SHA256 hash of the deb file for that version as obtained from Topaz.
 
-Currently Topaz does not publish the SHA256 digest separately, so you have to download the entire deb file first and compute the message digest yourself; `sha256sum TopazVideoAIBeta_<version>_amd64.deb`
-
-Example for building with a different version than the default:
-
-```
-$ curl -LO https://downloads.topazlabs.com/deploy/TopazVideoAIBeta/3.3.9.0.b/TopazVideoAIBeta_3.3.9.0.b_amd64.deb
-
-$ sha256sum TopazVideoAIBeta_3.3.9.0.b_amd64.deb
-a7de7730e039a8542280c65734143b6382c72eaa81e6fd8c0f23432ca13c8ba2  TopazVideoAIBeta_3.3.9.0.b_amd64.deb
-
+Example:
+```sh
 $ docker build --tag topaz-vai:3390b \
   --build-arg "VAI_VERSION=3.3.9.0.b" \
   --build-arg "VAI_SHA2=a7de7730e039a8542280c65734143b6382c72eaa81e6fd8c0f23432ca13c8ba2" \
@@ -91,21 +83,32 @@ b0deb4c919b6543879070cada170be2df9740db0a1be9fb16630151e005a8701  TopazVideoAIBe
 4d3971be331fe12fcd0e11e1e4666ef0ff3868cf03c3262338fc68b263afebf2  TopazVideoAIBeta_4.0.3.2.b_amd64.deb
 5bef82e774b70f74f040958e6516d703fab839f19a6bab5ccf72a1e1fc4ccae3  TopazVideoAIBeta_4.0.5.0.b_amd64.deb
 e8567bf60e1dec961cf4b471cd93c7ac63629ab49e97aac5b9e561409224d990  TopazVideoAIBeta_4.0.7.0.b_amd64.deb
+258627001c685aa9feed34a013b48003456f5fc5239151d6a5d5440b51fc795e  TopazVideoAIBeta_5.0.3.1.b_amd64.deb
 ```
 
-_This set of debs were those I could find in the Beta release notes that had binaries published for ubuntu, as of 2024-01-02._
+_This set of debs were those I could find in the Beta release notes that had binaries published for ubuntu, as of 2025-01-02. Additionally, since late 2024, Topaz has started publishing the hashes along with the deb packages (thanks Gregory), so you can find the hash along with the published version in the community forum's release notes without having to download the package yourself just to calculate the hash. For instance, [this](https://community.topazlabs.com/t/topaz-video-ai-linux-beta-v5-0-3-0-b/) release note._
+
+If you want to use a version which isn't on the list above, then these are the steps to produce the hash for that version, using 3.3.9.0.b as an example:
+```sh
+$ curl -LO https://downloads.topazlabs.com/deploy/TopazVideoAIBeta/3.3.9.0.b/TopazVideoAIBeta_3.3.9.0.b_amd64.deb
+
+$ sha256sum TopazVideoAIBeta_3.3.9.0.b_amd64.deb
+a7de7730e039a8542280c65734143b6382c72eaa81e6fd8c0f23432ca13c8ba2  TopazVideoAIBeta_3.3.9.0.b_amd64.deb
+
+$ rm TopazVideoAIBeta_3.3.9.0.b_amd64.deb  # was only needed to create the hash
+```
 
 ### Streamlining building and using different versions
 
 Building and testing different versions of VAI is a common task, and sort of the whole point of this repository. As such that process has been streamlined using the provided Makefile.
 
-```
+```sh
 $ make build VAI_VERSION=4.0.7.0.b \
              VAI_SHA2=e8567bf60e1dec961cf4b471cd93c7ac63629ab49e97aac5b9e561409224d990
 ```
 will create the necessary docker build commands and give your container a tag derived from the VAI version number you provided. In the example, it will run these commands for you.
 
-```
+```sh
 docker build -t topaz-vai \
 --build-arg "VAI_VERSION=4.0.7.0.b" \
 --build-arg "VAI_SHA2=e8567bf60e1dec961cf4b471cd93c7ac63629ab49e97aac5b9e561409224d990" .
@@ -122,6 +125,8 @@ If you want to use those targets with a different version, then just set the `la
 
 Yes. This project was specifically created to facilitate that use case.
 All you need is a valid `auth.tpz` file mounted or copied to the model's directory in the container: `/opt/TopazVideoAIBETA/models/auth.tpz`
+
+In fact, if you don't mind a watermark, you don't even need the license file. This is great if you just want to see if the software works on different machines, or benchmark performance between different hardware. In such cases the watermark doesn't matter, so you can run the container without any mounting or configuration needed. E.g. `docker run topaz-vai ffmpeg -h filter=tvai_up` to view the documentation of some topaz filter (enhancement model configuration).
 
 ### Q2: Will I ever need to refresh the auth.tpz file ?
 Yes. The file is only valid for a limited time. How long exactly, Topaz has not disclosed (to my knowledge).
@@ -160,4 +165,34 @@ For now having at least a common VAI setup that both the provider and customers 
 
 ### Q7: With the license key mounted, I still get the watermark on videos. Why?
 
-It's most likely because you don't provide a static hostname for the container, or the same hostname you used when "logging in" (getting the license key). Part of the minted license key information is the hostname. As such it's critical to use the same hostname for logging in as when running the container. That's why the examples in this document provide the --hostname argument to docker.
+One of three reasons:
+* A: Hostname mismatch, where the license was issued for one machine (hostname) but you're running the container on another (different hostname)
+* B: The license file itself has expired.
+* C: You're not entitled to use that specific version of TVAI.
+
+In case of A, ensure you're using the same  hostname for the container as you used during the login step (getting the license key). Part of the minted license key information is the hostname. As such it's critical to use the same hostname for logging in as when running the container. That's why the examples in this document provide the --hostname argument to docker. The Makefile always uses the hostname of your linux machine, so this potential mismatch shouldn't happen when using the make targets. It _may_ however happen if you launch the container on your own using docker, so just pay attention to this detail in such cases.
+
+In case of B, just redo the login step to get a refreshed license file from Topaz.
+
+Finally, in case of C, it could be that you are using a version of TVAI that your license doesn't cover. In particular, if you've cancelled your renewal at say before v5 was released, then it means you're only entitled to use versions 4.x and below. This is currently my exact situation. To verify if this is the case run `make test` and look at the ffmpeg output.
+
+A successful license pass will contain these lines:
+```
+INFO:  Checking for authentication at /opt/TopazVideoAIBETA/models/auth.tpz
+INFO:  Successfully authenticated for user: <your email address>
+```
+_using a 3.x or 4.x version in my case._
+
+An unsuccessful, such as when you're using a version you're not entitled to will instead show:
+```
+INFO:  Checking for authentication at /opt/TopazVideoAIBETA/models/auth.tpz
+CRITICAL:  Problems with unzipping file: Unable to get info on first file in zip archive
+CRITICAL:  Invalid auth file
+```
+_using v5 in my case, which my license doesn't cover._
+
+So just use a version that you are entitled for, and the watermark should go away.
+
+### Q8: Why the hassle with the deb hashes?
+
+Security. Specifically, in order to ensure that the Topaz code you bake into your image is in fact what you expect. It may be argued as a bit redundant, since the encrypted SSL (TLS/HTTPS) connection _should_ ensure secure communication between your machine and Topaz, and the DEB packages themselves usually also have some cryptographic verifications, that might be deemed sufficient. But I'm security paranoid, so there are two potential attacks and one accidental case using explicit hashing avoids; First, TLS is known to be insufficient to guard against nation state actors as they issue their own CA certificates and can MITM any traffic at their discretion when the public CA certificate list in browsers and linux distribution is relied on. Second, whomever controls Topaz's storage or CDN traffic could manipulate the data before it's sent to you, not to mention a potentially "rogue" employee. Third, to protect yourself against yourself; E.g. thinking you'd baked a certain version, but in fact it was another. Akin to the "please retype your password" check on a website signup.
